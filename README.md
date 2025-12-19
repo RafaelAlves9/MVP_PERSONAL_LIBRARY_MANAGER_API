@@ -11,13 +11,18 @@ API Flask que pesquisa livros na OpenLibrary, cacheia resultados em SQLite para 
 ## Arquitetura (fluxograma)
 ```mermaid
 flowchart LR
-    A[Cliente HTTP<br/>Swagger, curl, app] -->|Busca /books| B[Flask API<br/>/books]
-    A -->|Marca leitura /reads| C[Flask API<br/>/reads]
-    B -->|Consulta externa| D[OpenLibrary API]
-    B -->|Cache| E[(SQLite<br/>book_cache)]
-    C -->|Persiste leitura| F[(SQLite<br/>read_books)]
-    E -->|Dados de capa/autor| C
-    F -->|Listagem paginada| A
+    A[Cliente Web<br/>Navegador + React SPA] -->|HTTP (GET/POST JSON)| B[Frontend<br/>React app]
+    B -->|HTTP /api/*| C[Backend<br/>API HTTP]
+    C -->|Consultas SQL| D[(Banco de Dados<br/>SQL)]
+    C -->|Consulta externa| E[OpenLibrary API]
+
+    %% Orquestração com Docker Compose
+    subgraph F[Docker Compose<br/>orquestra serviços]
+        direction LR
+        B
+        C
+        D
+    end
 ```
 
 ## Requisitos
