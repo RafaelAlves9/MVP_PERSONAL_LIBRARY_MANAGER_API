@@ -11,13 +11,12 @@ API Flask que pesquisa livros na OpenLibrary, cacheia resultados em SQLite para 
 ## Arquitetura (fluxograma)
 ```mermaid
 flowchart LR
-    A[Cliente Web<br/>Navegador + React SPA] -->|HTTP (GET/POST JSON)| B[Frontend<br/>React app]
-    B -->|HTTP /api/*| C[Backend<br/>API HTTP]
-    C -->|Consultas SQL| D[(Banco de Dados<br/>SQL)]
-    C -->|Consulta externa| E[OpenLibrary API]
+    A[Cliente Web<br/>React SPA] -->|HTTP JSON| B[Frontend React]
+    B -->|HTTP /api| C[Backend API]
+    C -->|SQL| D[(Banco de Dados SQL)]
+    C -->|HTTP| E[OpenLibrary API]
 
-    %% Orquestração com Docker Compose
-    subgraph F[Docker Compose<br/>orquestra serviços]
+    subgraph DockerCompose[Docker Compose]
         direction LR
         B
         C
