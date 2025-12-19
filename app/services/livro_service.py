@@ -6,6 +6,10 @@ from app.repositories.read_repository import ReadRepository
 
 class BookService:
     @staticmethod
+    def _normalize_external_id(external_id: str) -> str:
+        return external_id if external_id.startswith("/") else f"/{external_id}"
+
+    @staticmethod
     def search_books(author: str | None, title: str | None, query: str | None, page: int, limit: int):
         # Se nenhum filtro for enviado, use busca ampla para evitar retorno vazio.
         if not (author or title or query):
@@ -38,22 +42,31 @@ class BookService:
 
     @staticmethod
     def ensure_cached_book(external_id: str):
-        cached = BookCacheRepository.get_by_external_id(external_id)
+        normalized_id = BookService._normalize_external_id(external_id)
+
+        cached = BookCacheRepository.get_by_external_id(normalized_id)
         if cached:
             return cached
 
-        work = OpenLibraryClient.fetch_work(external_id)
+        work = OpenLibraryClient.fetch_work(normalized_id)
         if not work:
             return None
 
         doc_like = {
-            "key": f"/{external_id.lstrip('/')}",
+            "key": normalized_id,
             "title": work.get("title"),
             "subtitle": work.get("subtitle"),
             "author_name": [a.get("name") for a in (work.get("authors") or []) if a.get("name")],
             "first_publish_year": work.get("first_publish_date"),
         }
         return BookCacheRepository.upsert_from_doc(doc_like)
+
+    @staticmethod
+    def get_book_by_external_id(external_id: str):
+        book = BookService.ensure_cached_book(external_id)
+        if not book:
+            return None
+        return book
 
 
 class ReadService:
@@ -90,3 +103,28 @@ class ReadService:
                 for r in items
             ],
         }
+
+    @staticmethod
+    def delete_read(read_id: int):
+        read_entry = ReadRepository.get_by_id(read_id)
+        if not read_entry:
+            return NotificationService.notify_error("Leitura não encontrada.", 404)
+
+        ReadRepository.delete(read_entry)
+        return {"message": "Leitura removida com sucesso."}, 200
+
+    @staticmethod
+    def update_read_note(read_id: int, note: str):
+        read_entry = ReadRepository.get_by_id(read_id)
+        if not read_entry:
+            return NotificationService.notify_error("Leitura não encontrada.", 404)
+
+        updated = ReadRepository.update_note(read_entry, note)
+        book = updated.book
+        return {
+            "message": "Observação atualizada.",
+            "read_id": updated.id,
+            "note": updated.note,
+            "read_at": updated.read_at.isoformat(),
+            "book": book.as_dict(),
+        }, 200

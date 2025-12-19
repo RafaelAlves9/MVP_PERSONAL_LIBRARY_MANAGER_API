@@ -73,9 +73,20 @@ flowchart LR
 
 ## Endpoints principais
 - `GET /books`: busca paginada na OpenLibrary. Query params: `page`, `limit` (até 50), `author`, `title`, `q`.
+- `GET /books/<external_id>`: busca detalhes de um livro por ID (key da OpenLibrary), usando cache local quando disponível.
 - `GET /reads`: lista paginada dos livros marcados como lidos localmente. Query params: `page`, `per_page` (até 50).
 - `POST /reads`: body `{"external_id": "<key da OpenLibrary>", "note": "observação opcional"}` para marcar como lido e salvar nota.
+- `PUT /reads/{read_id}`: atualiza apenas a observação de um livro já marcado como lido.
+- `DELETE /reads/{read_id}`: remove o registro de leitura.
 - Swagger: `/swagger`.
+
+## API externa utilizada (OpenLibrary)
+- Fonte: https://openlibrary.org/developers/api
+- Licença: dados públicos (Open Data / Public Domain; ver termos no site), sem necessidade de chave de API.
+- Cadastro: não requer cadastro nem token.
+- Rotas utilizadas:
+  - `GET /search.json` para busca (parâmetros `q`, `author`, `title`, `page`, `limit`).
+  - `GET /works/{work_id}.json` para detalhes de uma obra específica.
 
 ## Estrutura resumida
 - `app/controllers`: rotas RESTX.

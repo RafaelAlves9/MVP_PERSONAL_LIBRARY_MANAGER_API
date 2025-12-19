@@ -23,3 +23,18 @@ class ReadRepository:
         total = query.count()
         return items, total
 
+    @staticmethod
+    def get_by_id(read_id: int) -> ReadBook | None:
+        return ReadBook.query.filter_by(id=read_id).first()
+
+    @staticmethod
+    def delete(read_entry: ReadBook):
+        db.session.delete(read_entry)
+        db.session.commit()
+
+    @staticmethod
+    def update_note(read_entry: ReadBook, note: str) -> ReadBook:
+        read_entry.note = note
+        db.session.commit()
+        return read_entry
+

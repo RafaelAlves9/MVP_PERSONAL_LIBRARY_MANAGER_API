@@ -49,6 +49,13 @@ read_payload_model = swagger.model(
     },
 )
 
+read_note_payload_model = swagger.model(
+    "ReadNotePayload",
+    {
+        "note": fields.String(required=True, description="Nova observação para o livro lido"),
+    },
+)
+
 read_response_model = swagger.model(
     "ReadResponse",
     {

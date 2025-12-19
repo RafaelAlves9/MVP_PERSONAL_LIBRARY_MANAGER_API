@@ -2,11 +2,13 @@ from flask import request
 from flask_restx import Resource
 from app.services.livro_service import BookService, ReadService
 from app.settings.swagger import (
+    book_item_model,
     book_search_filters_model,
     book_search_response_model,
     read_payload_model,
     read_response_model,
     read_list_response_model,
+    read_note_payload_model,
 )
 
 
@@ -64,3 +66,32 @@ class BookController:
                 if not external_id:
                     return {"message": "external_id é obrigatório."}, 400
                 return ReadService.mark_as_read(external_id, note)
+
+        @reads_ns.route("/<int:read_id>")
+        class ReadDetailResource(Resource):
+            @swagger.doc("atualizar_observacao")
+            @swagger.expect(read_note_payload_model, validate=True)
+            @swagger.marshal_with(read_response_model)
+            def put(self, read_id):
+                """Atualiza a observação de um livro já marcado como lido."""
+                payload = request.json or {}
+                note = payload.get("note")
+                if note is None:
+                    return {"message": "note é obrigatório."}, 400
+                return ReadService.update_read_note(read_id, note)
+
+            @swagger.doc("remover_leitura")
+            def delete(self, read_id):
+                """Remove o registro de um livro marcado como lido."""
+                return ReadService.delete_read(read_id)
+
+        @books_ns.route("/<path:external_id>")
+        class BookDetailResource(Resource):
+            @swagger.doc("obter_livro_por_id")
+            @swagger.marshal_with(book_item_model)
+            def get(self, external_id):
+                """Obtém detalhes de um livro pelo external_id (key da OpenLibrary)."""
+                book = BookService.get_book_by_external_id(external_id)
+                if not book:
+                    return {"message": "Livro não encontrado."}, 404
+                return book.as_dict()
