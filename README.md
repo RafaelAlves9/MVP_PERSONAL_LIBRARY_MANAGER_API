@@ -11,7 +11,6 @@ API Flask que pesquisa livros na OpenLibrary, cacheia resultados em SQLite para 
 ## Arquitetura (fluxograma)
 ```mermaid
 flowchart LR
-    A[Cliente Web<br/>React SPA] -->|HTTP JSON| B[Frontend React]
     B -->|HTTP /api| C[Backend API]
     C -->|SQL| D[(Banco de Dados SQL)]
     C -->|HTTP| E[OpenLibrary API]
