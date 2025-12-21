@@ -22,7 +22,7 @@ services:
 
   frontend:
     build:
-      context: ../MVP_PERSONAL_LIBRARY_MANAGER_INTERFACE  # ajuste se o caminho for outro
+      context: ../MVP_PERSONAL_LIBRARY_MANAGER_INTERFACE
       dockerfile: Dockerfile
     container_name: books-frontend
     ports:
