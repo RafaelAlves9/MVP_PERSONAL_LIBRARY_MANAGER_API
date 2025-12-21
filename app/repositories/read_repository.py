@@ -3,6 +3,10 @@ from app.models.book_model import ReadBook, db
 
 class ReadRepository:
     @staticmethod
+    def get_by_book_id(book_id: int) -> ReadBook | None:
+        return ReadBook.query.filter_by(book_id=book_id).first()
+
+    @staticmethod
     def add_read(book, note: str | None = None) -> ReadBook:
         existing = ReadBook.query.filter_by(book_id=book.id).first()
         if existing:

@@ -76,6 +76,17 @@ class ReadService:
         if not book:
             return NotificationService.notify_error("Livro não encontrado na fonte externa.", 404)
 
+        # Evita duplicar leituras já cadastradas para o mesmo livro.
+        existing = ReadRepository.get_by_book_id(book.id)
+        if existing:
+            return {
+                "message": "Este livro já foi marcado como lido.",
+                "read_id": existing.id,
+                "book": book.as_dict(),
+                "note": existing.note,
+                "read_at": existing.read_at.isoformat(),
+            }, 409
+
         read_entry = ReadRepository.add_read(book, note)
         return {
             "message": "Livro marcado como lido.",

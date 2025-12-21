@@ -8,6 +8,9 @@ from app.settings.swagger import swagger
 
 def create_app():
     app = Flask(__name__)
+    # Permite que rotas respondam com ou sem barra final, evitando redirects (308/301)
+    # que costumam quebrar o preflight CORS em métodos como POST/PUT/DELETE.
+    app.url_map.strict_slashes = False
     db_path = os.getenv("DATABASE_URL", "sqlite:////app/instance/books.db")
     app.config["SQLALCHEMY_DATABASE_URI"] = db_path
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
