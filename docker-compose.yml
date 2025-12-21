@@ -17,8 +17,20 @@ services:
     volumes:
       - ./instance:/app/instance
     restart: unless-stopped
+    networks:
+      - appnet
+
+  frontend:
+    build:
+      context: ../MVP_PERSONAL_LIBRARY_MANAGER_INTERFACE  # ajuste se o caminho for outro
+      dockerfile: Dockerfile
+    container_name: books-frontend
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - appnet
 
 networks:
-  default:
+  appnet:
     driver: bridge
-
