@@ -62,7 +62,7 @@ flowchart LR
   ```
 - Docker Compose:
   ```bash
-  docker compose up -d
+  docker compose up -build
   ```
   O volume `./instance` é montado para persistir o SQLite fora do container.
 
